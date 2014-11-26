@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import message.ChatMessage;
 
 /**
@@ -40,17 +38,26 @@ public class ClientBackEnd implements Runnable{
             //kun sama objekti kyseessä, näiden järjetyksellä on väliä, ensin kirjoitus, sitten luku?
             output=new ObjectOutputStream(clientSocket.getOutputStream());
             input=new ObjectInputStream(clientSocket.getInputStream());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        //read and write from socket until user closes the app
-        while(true){
-            try {
+        
+            //read and write from socket until user closes the app
+            while(true){
+            
                 ChatMessage m = (ChatMessage)input.readObject();
                 System.out.println(m.getChatMessage());
-            } catch (IOException | ClassNotFoundException ex) {
-                ex.printStackTrace();
-            }
+            }    
+        } catch (IOException | ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        
+    }
+    
+    public void sendMessage(ChatMessage cm){
+        
+        try {
+            output.writeObject(cm);
+            output.flush();
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
     

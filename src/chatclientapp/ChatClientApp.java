@@ -10,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import message.ChatMessage;
 
 /**
  *
@@ -24,6 +25,12 @@ public class ChatClientApp extends Application {
         Scene scene = new Scene(root);
         
         stage.setScene(scene);
+        ClientBackEnd backEnd = new ClientBackEnd();
+        Thread backThread = new Thread(backEnd);
+        backThread.start();
+        ChatMessage chatM = new ChatMessage();
+        chatM.setChatMessage("Hello there!");
+        backEnd.sendMessage(chatM);
         stage.show();
     }
 
