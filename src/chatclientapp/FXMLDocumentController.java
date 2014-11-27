@@ -8,9 +8,16 @@ package chatclientapp;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
+import message.ChatMessage;
+import message.Participants;
 
 /**
  *
@@ -19,17 +26,55 @@ import javafx.scene.control.Label;
 public class FXMLDocumentController implements Initializable {
     
     @FXML
-    private Label label;
+    TextField chatMessage;
     
     @FXML
-    private void handleButtonAction(ActionEvent event) {
-        System.out.println("You clicked me!");
-        label.setText("Hello World!");
+    TextArea chatMessageArea;
+    
+    @FXML
+    ColorPicker colorPickerSelection;
+    
+    @FXML 
+    TextField nickNameField;
+    
+    ClientBackEnd backEnd;
+    Thread backThread;
+
+
+    
+    @FXML
+    public void sendChatMessage(ActionEvent ae){
+        
+        ChatMessage cm = new ChatMessage();
+        cm.setUserName(nickNameField.getText());
+        cm.setChatMessage(chatMessage.getText());
+
+        backEnd.sendMessage(cm);
+    }    
+
+    @FXML
+    public void setNickname(ActionEvent ae){
+        
+        if(nickNameField.getText().length()!=0){
+            chatMessage.setDisable(false);
+            nickNameField.setDisable(true);
+
+
+        }
     }
+
+
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        backEnd = new ClientBackEnd(this);
+        backThread = new Thread(backEnd);
+        backThread.setDaemon(true);
+        backThread.start(); //suorittaa backendin run-funktion
+        chatMessage.setDisable(true);        
     }    
+    public void updateTextArea(String m){
+        chatMessageArea.appendText(m + "\n");
+    }
     
 }

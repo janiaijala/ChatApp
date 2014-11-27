@@ -9,7 +9,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Platform;
 import message.ChatMessage;
+import message.Participants;
 
 /**
  *
@@ -20,11 +24,14 @@ public class ClientBackEnd implements Runnable{
     private Socket clientSocket;
     private ObjectOutputStream output;
     private ObjectInputStream input;
+    private FXMLDocumentController controller;
     
     //tämä ajetaan UI säikeessä, EDT säikeessä!! MIelellään kaikki toteutus siis run funktioon
-    public ClientBackEnd(){
+    public ClientBackEnd(FXMLDocumentController controller){
+        
         try {
             clientSocket = new Socket("localhost",3010); //localhost on sama kuin 127.0.0.1
+            this.controller=controller;
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -35,22 +42,45 @@ public class ClientBackEnd implements Runnable{
     @Override
     public void run() {
         try {
-            //kun sama objekti kyseessä, näiden järjetyksellä on väliä, ensin kirjoitus, sitten luku?
+            //kun sama objekti kyseessä, näiden järjestyksellä on väliä, ensin kirjoitus, sitten luku?
             output=new ObjectOutputStream(clientSocket.getOutputStream());
             input=new ObjectInputStream(clientSocket.getInputStream());
-        
+            
+            Participants p = new Participants();
+            
+            //Tähän parti p new parti p
+ //           p.setname(controller.getname())
+ //           output.writeObject(p);
+ //           output.flush();
+
+            
             //read and write from socket until user closes the app
             while(true){
             
-                ChatMessage m = (ChatMessage)input.readObject();
-                System.out.println(m.getChatMessage());
+                final ChatMessage m = (ChatMessage)input.readObject();
+
+                //kun toissijaisessa säikeessä ollaan, runlater komento siirtää alla olevan komennon EDT säikeeseen
+                Platform.runLater(new Runnable(){
+                    @Override
+                    public void run(){
+                        controller.updateTextArea(m.getUserName() + ": " + m.getChatMessage());
+                    }
+                });
+                
             }    
         } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();
-        }
-        
+        }        
     }
     
+    public void sendParticipants(Participants p){
+        try {
+            output.writeObject(p);
+            output.flush();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
     public void sendMessage(ChatMessage cm){
         
         try {
