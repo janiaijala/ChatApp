@@ -56,8 +56,11 @@ public class FXMLDocumentController implements Initializable {
     public void setNickname(ActionEvent ae){
         
         if(nickNameField.getText().length()!=0){
+            Participants p = new Participants();
             chatMessage.setDisable(false);
             nickNameField.setDisable(true);
+            p.setParticipants(nickNameField.getText());
+            backEnd.sendParticipants(p);
 
 
         }

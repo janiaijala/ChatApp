@@ -45,13 +45,6 @@ public class ClientBackEnd implements Runnable{
             //kun sama objekti kyseessä, näiden järjestyksellä on väliä, ensin kirjoitus, sitten luku?
             output=new ObjectOutputStream(clientSocket.getOutputStream());
             input=new ObjectInputStream(clientSocket.getInputStream());
-            
-            Participants p = new Participants();
-            
-            //Tähän parti p new parti p
- //           p.setname(controller.getname())
- //           output.writeObject(p);
- //           output.flush();
 
             
             //read and write from socket until user closes the app
