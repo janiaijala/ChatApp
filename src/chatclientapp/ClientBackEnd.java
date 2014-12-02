@@ -9,10 +9,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import message.ChatMessage;
+import message.ClientList;
 import message.Participants;
 
 /**
@@ -50,16 +51,27 @@ public class ClientBackEnd implements Runnable{
             //read and write from socket until user closes the app
             while(true){
             
-                final ChatMessage m = (ChatMessage)input.readObject();
+                Object object = input.readObject();
+                if(object instanceof ChatMessage){
+                    ChatMessage m = (ChatMessage)object;                
+                    //kun toissijaisessa säikeessä ollaan, runlater komento siirtää alla olevan komennon EDT säikeeseen
+                    Platform.runLater(new Runnable(){
+                        @Override
+                        public void run(){
+                            controller.updateTextArea(m.getUserName() + ": " + m.getChatMessage());
+                        }
+                    });
+                }else if(object instanceof ClientList){
+                    ClientList cl = (ClientList)object;
+                    final ObservableList<String> clients = FXCollections.observableArrayList(cl.getClientList());
+                    Platform.runLater(new Runnable(){
+                        @Override
+                        public void run(){
+                            controller.setlistOfUsers(clients);
+                        }
+                    });
+                }
 
-                //kun toissijaisessa säikeessä ollaan, runlater komento siirtää alla olevan komennon EDT säikeeseen
-                Platform.runLater(new Runnable(){
-                    @Override
-                    public void run(){
-                        controller.updateTextArea(m.getUserName() + ": " + m.getChatMessage());
-                    }
-                });
-                
             }    
         } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();

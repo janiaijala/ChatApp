@@ -7,15 +7,15 @@ package chatclientapp;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.paint.Color;
 import message.ChatMessage;
 import message.Participants;
 
@@ -36,6 +36,15 @@ public class FXMLDocumentController implements Initializable {
     
     @FXML 
     TextField nickNameField;
+    
+    @FXML
+    ListView listOfUsers;    
+    
+    @FXML
+    ComboBox fontSelector;
+    
+    @FXML
+    ColorPicker colorSelector;
     
     ClientBackEnd backEnd;
     Thread backThread;
@@ -75,9 +84,18 @@ public class FXMLDocumentController implements Initializable {
         backThread.setDaemon(true);
         backThread.start(); //suorittaa backendin run-funktion
         chatMessage.setDisable(true);        
+        
     }    
     public void updateTextArea(String m){
+        //Text text1 = new Text(m);
+        //text1.setFill(Color.RED);
+        //TextFlow textFlow = new TextFlow(text1);
         chatMessageArea.appendText(m + "\n");
     }
     
+    @FXML
+    public void setlistOfUsers(ObservableList<String> users){
+        //listOfUsers.getItems().removeAll(listOfUsers.getItems());
+        //listOfUsers.setItems(users);
+    }
 }
